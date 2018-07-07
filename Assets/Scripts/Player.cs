@@ -1,19 +1,47 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.Animations;
 
 public class Player : MonoBehaviour
 {
 	public float moveSpeed = 10f;
 
 	private Vector3 direction;
+	private bool wasMovingDown;
+	private bool wasMovingRight;
+
+	private bool _moving;
+	private bool moving
+	{
+		get {return _moving;}
+		set
+		{
+			_moving = value;
+			animController.SetBool("moving", _moving);
+		}
+	}
+	private AnimatorController animController;
+
+	void Awake ()
+	{
+		animController = GetComponent<AnimatorController>();
+
+		if (animController == null) Debug.LogError("No AnimatorController component found attached to this gameObject! [PLAYER.CS]");
+	}
+
+	void Start()
+	{
+		wasMovingDown = true;
+		wasMovingRight = true;
+		moving = false;
+	}
 
 	void Update ()
 	{
+		direction = Vector3.zero;
 
-		direction = new Vector3 (0, 0, 0);
-
-		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow))) {			//General movement vector is calculated here
+		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow))) {
 			direction = (Vector3.up + Vector3.right) / Mathf.Sqrt (2);
 		} else if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow))) {
 			direction = (Vector3.up + Vector3.left) / Mathf.Sqrt (2);
@@ -31,13 +59,19 @@ public class Player : MonoBehaviour
 			direction = Vector3.right;
 		}
 
-		direction = direction.normalized;																										//Normalize the vector
+		direction = direction.normalized;
 	}
 
 	void FixedUpdate ()
 	{
-		if (direction != Vector3.zero) {												//Actual movement - transform.Translate in the direction given in the Update() method
+		if (direction != Vector3.zero)
+		{
 			transform.Translate (moveSpeed * direction * Time.deltaTime);
+			moving = true;
+		}
+		else
+		{
+			moving = false;
 		}
 	}
 }
