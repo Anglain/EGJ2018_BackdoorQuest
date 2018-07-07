@@ -4,13 +4,26 @@ using UnityEngine;
 
 public class BalloonEnemy : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
+	public Transform pointA;
+	public Transform pointB;
+
+	public float speed;
+
+	private bool movingToA = false;
+
+	void Awake()
+	{
+		if (pointA == null) Debug.LogError("No pointA Transform assigned to this gameObject! [BALLOON_ENEMY.CS]");
+		if (pointB == null) Debug.LogError("No pointB Transform assigned to this gameObject! [BALLOON_ENEMY.CS]");
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	void Start()
+	{
+		movingToA = false;
+	}
+
+	void FixedUpdate()
+	{
+
 	}
 }

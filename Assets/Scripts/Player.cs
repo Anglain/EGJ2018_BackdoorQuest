@@ -10,24 +10,15 @@ public class Player : MonoBehaviour
 	private Vector3 direction;
 	private bool wasMovingDown;
 	private bool wasMovingRight;
+	private bool moving;
 
-	private bool _moving;
-	private bool moving
-	{
-		get {return _moving;}
-		set
-		{
-			_moving = value;
-			animController.SetBool("moving", _moving);
-		}
-	}
-	private AnimatorController animController;
+	private Animator animController;
 
 	void Awake ()
 	{
-		animController = GetComponent<AnimatorController>();
+		animController = GetComponent<Animator>();
 
-		if (animController == null) Debug.LogError("No AnimatorController component found attached to this gameObject! [PLAYER.CS]");
+		if (animController == null) Debug.LogError("No Animator component found attached to this gameObject! [PLAYER.CS]");
 	}
 
 	void Start()
@@ -43,20 +34,34 @@ public class Player : MonoBehaviour
 
 		if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow))) {
 			direction = (Vector3.up + Vector3.right) / Mathf.Sqrt (2);
+			wasMovingDown = false;
+			wasMovingRight = true;
 		} else if ((Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) && (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow))) {
 			direction = (Vector3.up + Vector3.left) / Mathf.Sqrt (2);
+			wasMovingDown = false;
+			wasMovingRight = false;
 		} else if ((Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) && (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow))) {
 			direction = (Vector3.down + Vector3.right) / Mathf.Sqrt (2);
+			wasMovingDown = true;
+			wasMovingRight = true;
 		} else if ((Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) && (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow))) {
 			direction = (Vector3.down + Vector3.left) / Mathf.Sqrt (2);
+			wasMovingDown = true;
+			wasMovingRight = false;
 		} else if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.UpArrow)) {
 			direction = Vector3.up;
+			wasMovingDown = false;
 		} else if (Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.DownArrow)) {
 			direction = Vector3.down;
+			wasMovingDown = true;
 		} else if (Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.LeftArrow)) {
 			direction = Vector3.left;
+			wasMovingRight = false;
 		} else if (Input.GetKey (KeyCode.D) || Input.GetKey (KeyCode.RightArrow)) {
 			direction = Vector3.right;
+			wasMovingRight = true;
+		} else {
+			direction = Vector3.zero;
 		}
 
 		direction = direction.normalized;
@@ -73,5 +78,9 @@ public class Player : MonoBehaviour
 		{
 			moving = false;
 		}
+
+		animController.SetBool("movingDown", wasMovingDown);
+		animController.SetBool("movingRight", wasMovingRight);
+		animController.SetBool("moving", moving);
 	}
 }

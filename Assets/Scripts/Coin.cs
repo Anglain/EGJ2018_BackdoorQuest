@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Coin : MonoBehaviour {
+public class Coin : Collectable {
 
-	void OnTriggerStay2D(Collider2D collider)
+	protected override void GetHit(Collider2D collider)
 	{
-		Destroy(this.gameObject);
+		Debug.Log("Coin collected.");
+		DestroyObject();
 	}
 }

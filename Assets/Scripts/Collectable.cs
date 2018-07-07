@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class Collectable : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
+	protected virtual void GetHit(Collider2D collider){}
+
+	void OnTriggerStay2D(Collider2D collider)
+	{
+		GetHit(collider);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	protected void DestroyObject()
+	{
+		Destroy(this.gameObject);
 	}
 }
