@@ -4,10 +4,19 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
 
-	public bool gotCoin = false;
+	private bool gotCoin = false;
+
+	void Awake()
+	{
+		DontDestroyOnLoad(this.gameObject);
+	}
 
 	void Start()
 	{
 		gotCoin = false;
 	}
+
+	public void NoCoin() { gotCoin = false; }
+	public void PickedUpCoin() { gotCoin = true; }
+	public bool HasCoin() { return gotCoin; }
 }

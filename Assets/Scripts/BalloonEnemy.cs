@@ -7,7 +7,7 @@ public class BalloonEnemy : MonoBehaviour {
 	public Transform pointA;
 	public Transform pointB;
 
-	public float speed;
+	public float speed = 6f;
 
 	private bool movingToA = false;
 

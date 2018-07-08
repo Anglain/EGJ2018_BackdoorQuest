@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Gift : Collectable {
+public class Gift : MonoBehaviour {
 
-	protected override void GetHit(Collider2D collider)
+	public void Pop()
 	{
-		Debug.Log("Gift collected.");
-		DestroyObject();
+		Debug.Log("Gift pop!");
+		Destroy(this.gameObject);
 	}
 }

@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class ExitGates : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+	void OnTriggerEnter2D () {
+		LevelLoader ll = GameObject.FindWithTag("LevelLoader").GetComponent<LevelLoader>();
+
+		if (ll == null) Debug.LogError("Could not find levelLoader in the scene! [EXIT_GATES.CS]");
+
+		ll.LoadNextScene();
 	}
 }
