@@ -7,6 +7,8 @@ public class Coin : Collectable {
 	protected override void GetHit(Collider2D collider)
 	{
 		Debug.Log("Coin collected.");
+
+		GameController.gc.PickedUpCoin();
 		DestroyObject();
 	}
 }

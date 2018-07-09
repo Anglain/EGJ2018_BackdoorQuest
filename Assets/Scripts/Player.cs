@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.Animations;
 
 public class Player : MonoBehaviour
 {
@@ -9,11 +8,13 @@ public class Player : MonoBehaviour
 
 	[Space(5)]
 	[Header("Hit colliders")]
-	public Collider2D upperRightHitCol;
-	public Collider2D upperLeftHitCol;
-	public Collider2D downRightHitCol;
-	public Collider2D downLeftHitCol;
-	public LayerMask whatToHit;
+	public Transform upperRightHitPos;
+	public Transform upperLeftHitPos;
+	public Transform downRightHitPos;
+	public Transform downLeftHitPos;
+	public float attackRange;
+	public LayerMask whatIsEnemy;
+	public LayerMask whatIsGift;
 
 	private Vector3 direction;
 	private bool wasMovingDown;
@@ -23,8 +24,6 @@ public class Player : MonoBehaviour
 	private Animator animController;
 	private Rigidbody2D rb2D;
 
-	private ContactFilter2D filter2D;
-
 	void Awake ()
 	{
 		animController = GetComponent<Animator>();
@@ -33,10 +32,10 @@ public class Player : MonoBehaviour
 		rb2D = GetComponent<Rigidbody2D>();
 		if (rb2D == null) Debug.LogError("No Rigidbody2D component found attached to this gameObject! [PLAYER.CS]");
 
-		upperRightHitCol.enabled = false;
-		upperLeftHitCol.enabled = false;
-		downRightHitCol.enabled = false;
-		downLeftHitCol.enabled = false;
+		if (upperRightHitPos == null) Debug.LogError("No upperRightHitPos transform found assigned to this gameObject! [PLAYER.CS]");
+		if (upperLeftHitPos == null) Debug.LogError("No upperLeftHitPos transform found assigned to this gameObject! [PLAYER.CS]");
+		if (downRightHitPos == null) Debug.LogError("No downRightHitPos transform found assigned to this gameObject! [PLAYER.CS]");
+		if (downLeftHitPos == null) Debug.LogError("No downLeftHitPos transform found assigned to this gameObject! [PLAYER.CS]");
 	}
 
 	void Start()
@@ -44,8 +43,6 @@ public class Player : MonoBehaviour
 		wasMovingDown = true;
 		wasMovingRight = true;
 		moving = false;
-
-		filter2D.SetLayerMask(whatToHit);
 	}
 
 	void Update ()
@@ -109,48 +106,35 @@ public class Player : MonoBehaviour
 			animController.SetBool("movingRight", wasMovingRight);
 			animController.SetTrigger("attack");
 
-			RaycastHit2D[] hitObjects = new RaycastHit2D[40];
+			Vector3 attackPos;
 			if (wasMovingDown && wasMovingRight)
-			{
-				downRightHitCol.enabled = true;
-				downRightHitCol.Cast(Vector2.zero, filter2D, hitObjects);
-				downRightHitCol.enabled = false;
-			}
+				attackPos = downRightHitPos.position;
 			else if (wasMovingDown && !wasMovingRight)
-			{
-				downLeftHitCol.enabled = true;
-				downLeftHitCol.Cast(Vector2.zero, filter2D, hitObjects);
-				downLeftHitCol.enabled = false;
-			}
+				attackPos = downLeftHitPos.position;
 			else if (!wasMovingDown && wasMovingRight)
-			{
-				upperRightHitCol.enabled = true;
-				upperRightHitCol.Cast(Vector2.zero, filter2D, hitObjects);
-				upperRightHitCol.enabled = false;
-			}
+				attackPos = upperRightHitPos.position;
 			else
-			{
-				upperLeftHitCol.enabled = true;
-				upperLeftHitCol.Cast(Vector2.zero, filter2D, hitObjects);
-				upperRightHitCol.enabled = false;
-			}
+				attackPos = upperLeftHitPos.position;
 
-			if (hitObjects.Length != 0)
-			{
-				foreach(RaycastHit2D hitObj in hitObjects)
-				{
-					if (hitObj.transform != null && hitObj.transform.gameObject.tag == "Gift")
-					{
-						Gift gift = hitObj.transform.gameObject.GetComponent<Gift>();
+			Debug.Log(attackPos);
+			Debug.DrawLine(transform.position, attackPos, Color.green);
+			Collider2D[] enemies = Physics2D.OverlapCircleAll(attackPos, attackRange, whatIsEnemy);
+			Collider2D[] gifts = Physics2D.OverlapCircleAll(attackPos, attackRange, whatIsGift);
 
-						if (gift != null)
-						{
-							gift.Pop();
-						}
-					}
-				}
+			foreach(Collider2D gift in gifts)
+			{
+				gift.GetComponent<Gift>().Pop();
 			}
 		}
+	}
+
+	void OnDrawGizmosSelected()
+	{
+		Gizmos.color = Color.red;
+		Gizmos.DrawWireSphere(upperLeftHitPos.position, attackRange);
+		Gizmos.DrawWireSphere(upperRightHitPos.position, attackRange);
+		Gizmos.DrawWireSphere(downLeftHitPos.position, attackRange);
+		Gizmos.DrawWireSphere(downRightHitPos.position, attackRange);
 	}
 
 	void FixedUpdate ()

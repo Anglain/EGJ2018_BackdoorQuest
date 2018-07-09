@@ -4,11 +4,25 @@ using UnityEngine;
 
 public class ExitGates : MonoBehaviour {
 
-	void OnTriggerEnter2D () {
-		LevelLoader ll = GameObject.FindWithTag("LevelLoader").GetComponent<LevelLoader>();
+	private LevelLoader ll;
 
-		if (ll == null) Debug.LogError("Could not find levelLoader in the scene! [EXIT_GATES.CS]");
+	void Start ()
+	{
+		ll = GameObject.FindWithTag("LevelLoader").GetComponent<LevelLoader>();
+		if (ll == null) Debug.LogError("Could not find LevelLoader in the scene! [EXIT_GATES.CS]");
+	}
 
+	void OnCollisionEnter2D () {
+
+		if (GameController.gc.HasCoin())
+		{
+			//Trigger animation
+			NextScene();
+		}
+	}
+
+	public void NextScene()
+	{
 		ll.LoadNextScene();
 	}
 }
