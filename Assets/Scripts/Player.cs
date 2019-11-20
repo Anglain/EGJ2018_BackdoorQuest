@@ -1,11 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
-	public float speedForce = 10f;
-
 	[Space(5)]
 	[Header("Hit colliders")]
 	public Transform upperRightHitPos;
@@ -16,10 +15,50 @@ public class Player : MonoBehaviour
 	public LayerMask whatIsEnemy;
 	public LayerMask whatIsGift;
 
+	[Space(5)]
+	[Header("Player stats")]
+	public float attackDamage = 5f;
+	public float maxHealthPoints = 20f;
+	public float pushbackAmount = 200f;
+	public float speedForce = 10f;
+	public float maxGloryPoints = 10f;
+
+	[Space(5)]
+	[Header("UI elements")]
+	public Image hpImage;
+	public Image gloryImage;
+	public Text gloryText;
+
+	private float _gloryPoints;
+	private float gloryPoints
+	{
+		get { return _gloryPoints; }
+		set
+		{
+			_gloryPoints = value;
+			gloryImage.fillAmount = 1f * (maxGloryPoints / _gloryPoints);
+			_gloryPoints = Mathf.Clamp(_gloryPoints, 0, maxGloryPoints);
+			if (gloryPoints == maxGloryPoints) gloryText.text = "Glory level achieved!";
+		}
+	}
+	private float _healthPoints;
+	private float healthPoints
+	{
+		get { return _healthPoints; }
+		set
+		{
+			_healthPoints = value;
+			hpImage.fillAmount = maxHealthPoints / _healthPoints;
+			_healthPoints = Mathf.Clamp(_healthPoints, 0, maxHealthPoints);
+			if (_healthPoints == 0) Die();
+		}
+	}
+
 	private Vector3 direction;
 	private bool wasMovingDown;
 	private bool wasMovingRight;
 	private bool moving;
+	private bool dead = false;
 
 	private Animator animController;
 	private Rigidbody2D rb2D;
@@ -43,6 +82,31 @@ public class Player : MonoBehaviour
 		wasMovingDown = true;
 		wasMovingRight = true;
 		moving = false;
+		dead = false;
+		Regenerate();
+		GetGlorious(-1000f);
+	}
+
+	public void GetGlorious(float gloryBonus)
+	{
+		gloryPoints += gloryBonus;
+	}
+
+	public void GetHit(float damage)
+	{
+		healthPoints -= damage;
+	}
+
+	public void Regenerate()
+	{
+		healthPoints = maxHealthPoints;
+	}
+
+	void Die()
+	{
+		animController.SetTrigger("death");
+		GameController.gc.RespawnScreen();
+		dead = true;
 	}
 
 	void Update ()
@@ -98,9 +162,12 @@ public class Player : MonoBehaviour
 			direction = Vector3.zero;
 		}
 
-		direction = direction.normalized;
+		if (!dead)
+			direction = direction.normalized;
+		else
+			direction = Vector3.zero;
 
-		if (Input.GetKeyDown(KeyCode.Space))
+		if (Input.GetKeyDown(KeyCode.Space) && !dead)
 		{
 			animController.SetBool("movingDown", wasMovingDown);
 			animController.SetBool("movingRight", wasMovingRight);
@@ -121,9 +188,19 @@ public class Player : MonoBehaviour
 			Collider2D[] enemies = Physics2D.OverlapCircleAll(attackPos, attackRange, whatIsEnemy);
 			Collider2D[] gifts = Physics2D.OverlapCircleAll(attackPos, attackRange, whatIsGift);
 
+			Debug.Log(enemies.Length + " " + gifts.Length);
 			foreach(Collider2D gift in gifts)
 			{
+				Debug.Log("GIFT!!!!");
 				gift.GetComponent<Gift>().Pop();
+			}
+
+			foreach(Collider2D enemy in enemies)
+			{
+				Debug.Log("ENEMY!!!!");
+				enemy.GetComponent<Enemy>().GetHit(attackDamage);
+				Vector3 forceVector = Vector3.Normalize(transform.position - enemy.transform.position);
+				enemy.GetComponent<Rigidbody2D>().AddForce(forceVector* (-1f) * pushbackAmount);
 			}
 		}
 	}

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum GiftResult
 {
-	Nothing, Coin, Balloon
+	Nothing, Coin, Balloon1, Balloon2, Balloon3
 }
 
 public class Gift : MonoBehaviour {
@@ -25,7 +25,7 @@ public class Gift : MonoBehaviour {
 		{
 			Instantiate(GameController.gc.coinPrefab, transform.position, Quaternion.identity);
 		}
-		else if (spawn == GiftResult.Balloon)
+		else if (spawn == GiftResult.Balloon1)
 		{
 			Instantiate(GameController.gc.balloon1Prefab, transform.position, Quaternion.identity);
 		}

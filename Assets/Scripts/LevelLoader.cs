@@ -24,5 +24,6 @@ public class LevelLoader : MonoBehaviour {
 		{
 			SceneManager.LoadScene(0);
 		}
+		GameController.gc.SetLevel();
 	}
 }

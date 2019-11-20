@@ -16,7 +16,6 @@ public class ExitGates : MonoBehaviour {
 
 		if (GameController.gc.HasCoin())
 		{
-			//Trigger animation
 			NextScene();
 		}
 	}
