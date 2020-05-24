@@ -203,6 +203,10 @@ public class Player : MonoBehaviour
 				enemy.GetComponent<Rigidbody2D>().AddForce(forceVector* (-1f) * pushbackAmount);
 			}
 		}
+
+		animController.SetBool("movingDown", wasMovingDown);
+		animController.SetBool("movingRight", wasMovingRight);
+		animController.SetBool("moving", moving);
 	}
 
 	void OnDrawGizmosSelected()
@@ -225,9 +229,5 @@ public class Player : MonoBehaviour
 		{
 			moving = false;
 		}
-
-		animController.SetBool("movingDown", wasMovingDown);
-		animController.SetBool("movingRight", wasMovingRight);
-		animController.SetBool("moving", moving);
 	}
 }
